@@ -1,0 +1,183 @@
+
+// --- -- --- ----- -- --- ----- -- --- ----- -- --- ----- -- --- --
+//Pharma App Script  --- -- --- ----- -- --- ----- -- --- ----- -- --- 
+
+/* -- @startup -- */
+window.onload = function () {
+    listProduct();
+}
+
+/*
+Fonction Test d'un Nombre Entier Positif (Sup 0) 
+(Number) nb = nombre a tester*/
+function nEP(nb) {
+    if ( !isNaN(nb) && nb%1 === 0 && nb >= 0 ) { 
+    return nb; } else { return false; }
+}
+/*
+check s'il existe et String */
+function checkStr(x) {
+    if ( x!==null && isNaN(x) ) { return x;
+    } else { return false; }
+}
+
+
+/*
+Loading localStorage DB @startup */
+function loadingBD(){
+    if ( !(localStorage.jsonStockDB) ) {             // && !stock
+        localStorage.setItem('jsonStockDB', '');
+    } else {
+        stock = JSON.parse(localStorage.getItem('jsonStockDB'));
+    }
+}
+/*
+LOCAL STORAGE */
+function updateLS() {
+    localStorage.setItem('jsonStockDB', JSON.stringify(stock));
+}
+
+
+/*
+Fonction d'ajout d'un produit
+(String & Int) */
+function addProduct(name,qtt) {
+    if ( !(stock[name]) ) {
+        stock[name] = qtt;
+        updateLS();
+    } else {
+        if (window.confirm(name+" existe !\nVoulez-vous modifier ce produit ?") ){
+            editProduct(name,qtt);
+        } else { window.alert(name+" n'a pas été modifier."); }
+    }
+    $('#medName,#medQtt').val('');
+}
+
+/*
+Fonction de modif d'un produit
+(String & Int) */ 
+function editProduct(prd,newVal) {
+    if ( stock[prd] ) {
+        // stock[prd]+= Number(newVal);         // pour incrémenter le stock
+        stock[prd] = Number(newVal);            // reSet la valeur du stock
+        updateLS();
+    } else {
+        alert("Err: Produit n'existe pas !");
+    }
+    $('#medName,#medQtt').val('');
+}
+/*
+Fonction de modif d'un produit
+(par le boutton du tableau) */ 
+function switchProduct(old) {
+    $('#js-AMS').text('Modifier');
+    $('#medName').val(old);
+    $('#medQtt').val(stock[old]);
+}
+
+/*
+Fonction de suppression d'un produit
+(string) */
+function remProduct(name) {
+    if (stock[name]) {
+        if ( window.confirm(name + ' va être supprimer définitivement.\nEtes-vous sur ?') ) {
+            delete stock[name];
+            updateLS();
+        }
+    } else { window.alert(name + " n'éxiste pas") }
+    $('#medName').val('');
+}
+
+/*
+Liste l'objet 'stock' (entrées au stock)
+avant de les retourner dans un tableau. */
+function listProduct(){
+    let html = '';
+    for (key in stock) {
+        html+='<tr><th scope="row"><a href="#" class="badge badge-warning js-tab-edit" data-nom="'+(key)+'">edit</a><a href="#" class="js-tab-del badge badge-danger" data-nom="'+(key)+'">del</a></th><th scope="row">'+key+'</th><td>'+stock[key]+'</td></tr>';
+    }
+    $('#jq-inserTabl').html(html);
+}
+
+// --- -- --- ----- -- --- ----- -- --- ----- -- --- ----- -- --- --
+// --- -- --- ----- -- --- FIN FONCTIONS ----- -- --- ----- -- --- --
+// --- -- --- ----- -- --- ----- -- --- ----- -- --- ----- -- --- --
+
+var stock={};
+var nombre, numero;
+loadingBD();
+
+jQuery(document).ready(function(){
+
+    $('#medNalert,#medQalert').hide();
+
+//----------------------------------------------- PAGE SWITCH
+    $('#js-AMS').click(function(){
+        let x = $('#js-AMS').text();
+
+        if ( x == 'Ajouter' ) {
+            $('#js-AMS').text('Modifier');
+            $('#medBtn').text('Edit');
+
+        } else if ( x == 'Modifier' ) {
+            $('#js-AMS').text('Supprimer');
+            $('#medQtt').hide();
+            $('#medBtn').text('Delete');
+
+        } else {
+            $('#js-AMS').text('Ajouter');
+            $('#medQtt').show();
+            $('#medBtn').text('Add');
+        }
+    });
+
+//----------------------------------------------- SUBMIT
+    $("form").submit(function(e){
+        e.preventDefault();
+        $('#medName, #medQtt').css({"border":"none"});
+        $('#medNalert,#medQalert').hide();
+
+        nombre = checkStr($('#medName').val());
+        numero = Number(nEP($('#medQtt').val()));
+        
+        if (nombre) {
+            let x = $('#js-AMS').text();
+            if (numero) {
+                if ( x == 'Ajouter' ) {
+                    addProduct(nombre,numero);
+                } else if ( x == 'Modifier' ) {
+                    editProduct(nombre,numero);
+                    }
+            } else if ( x == 'Supprimer' ) {
+                remProduct(nombre);
+            } else {
+                $('#medQtt').css({"border":"2px solid red"});
+                $('#medQalert').show();
+            }    
+        } else {
+            $('#medName').css({"border":"2px solid red"});
+            $('#medNalert').show();
+        }
+        listProduct();
+    });
+
+
+//----------------------------------------------- TABL CLICK BTNs edit & del
+    $(document).on("click",".js-tab-edit",function(){
+        let old = $(this).data('nom');
+        switchProduct(old);
+        listProduct();
+    });
+
+    $(document).on("click",".js-tab-del",function(){
+        let x = $(this).data('nom');
+        remProduct(x);
+        listProduct();
+    });
+    
+    
+
+
+
+
+});

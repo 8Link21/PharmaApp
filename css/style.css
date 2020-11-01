@@ -1,0 +1,25 @@
+body {
+    color: #12263f;
+    border-color: #95aac9;
+    background-color: cornflowerblue;
+}
+
+.wxc-bg-light {
+    background-color: aliceblue;
+}
+
+.wxc-c1 {
+    color: #12263f;
+}
+
+#js-AMS {
+    color : #2980b9;
+    display: inline-block;
+    vertical-align: bottom;
+    overflow: hidden
+}
+
+#js-AMS:hover {
+    cursor: pointer;
+    font-size: 90%;    
+}

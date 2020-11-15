@@ -4,7 +4,7 @@ Website d'une pharmacie.
 Possibilité d'Insérer/Editer/Supprimer 
  
 # Techno: 
-Javascript (Vanilla)
+Javascript (Vanilla) & jQuery
 
 Local Storage (par JSON)
 
